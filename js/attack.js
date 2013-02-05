@@ -1,11 +1,18 @@
 $(function(){
 	var Canvas = "#Canvas",
+		CanvasObj = $("#Canvas"),
 		circles = {},
 		pointerCircle = "pointer-circle";
+
+
+	// resize the canvas to fill browser window dynamically
+    //window.addEventListener('resize', resizeCanvas, false);
+
 	/*
 	 * Draw a Circle where the mouse should be
 	 */
-	$(Canvas).mousemove(function(e){
+	CanvasObj.mousemove(function(e){
+		console.log("hi");
 		var x = e.pageX,
 			y = e.pageY,
 			r = 5;
@@ -18,7 +25,7 @@ $(function(){
 	/*
 	 * Do something on Mouse click
 	 */
-	 $(Canvas).click(function(e){
+	CanvasObj.click(function(e){
 	 	Log("Click X:" + e.pageX + ", Y:" + e.pageY);
 	 });
 
@@ -59,6 +66,12 @@ $(function(){
 	  	
 	  	pointerSVGCircle.exit().remove();
 	}
+
+	// resizeCanvas();
+	// function resizeCanvas(){
+	// 	CanvasObj.width = window.innerWidth;
+ //        CanvasObj.height = window.innerHeight;
+	//}
 	  
 	 /*
 	  * Append Data to the interaction Log
