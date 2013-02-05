@@ -1,0 +1,15 @@
+/*html{
+	cursor: none;
+}*/
+
+
+#Canvas{
+	cursor: none;
+	float: left;
+}
+#Logger{
+	float: right;
+	max-height: 500px;
+	overflow-y: auto;
+	width: 300px;
+}
