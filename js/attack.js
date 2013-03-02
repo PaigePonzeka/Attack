@@ -3,7 +3,16 @@ $(function(){
 		CanvasObj = $("#Canvas"),
 		circles = [],
 		pointerCircle = "pointer-circle",
-		totalTestCircles = 5;
+		totalTestCircles = 10,
+		temps = {},
+		circleColors = [
+				"#0fa1ff", // blue
+				"#99ff00", // green
+				"#9900ff", // purple
+				"#ff0099", // pink
+				"#ffbc00" // orange
+		],
+		totalClicks = circleColors.length - 1;
 
 	Init();
 	
@@ -12,31 +21,31 @@ $(function(){
 	// resize the canvas to fill browser window dynamically
     //window.addEventListener('resize', resizeCanvas, false);
 
-	/*
-	 * Draw a Circle where the mouse should be
-	 */
-	CanvasObj.mousemove(function(e){
-		var x = e.pageX,
-			y = e.pageY,
-			r = 5;
 
-		var circle = {'x' : x, 'y': y, 'r': r};
-		Log("Move: X:" + x + ", Y:" + y);
-		DrawPointerCircle(circle);
+	$('body').on('click', 'circle', function(){
+		var circlePosition = $(this).data('position'); 
+		var circle = circles[circlePosition ];
+		//circle.clicks = "#00ff00";
+		if(circle.numOfClicks){
+			circle.numOfClicks += 1;
+		}
+		else{
+			circle.numOfClicks = 1;
+		}
+		circle.color = circleColors[circle.numOfClicks];
+
+		if(circle.numOfClicks >= totalClicks ){
+			//delete circles[circlePosition];
+			//Log("DESTROY");
+		}
+		
 	});
-
-	/*
-	 * Do something on Mouse click
-	 */
-	CanvasObj.click(function(e){
-	 	Log("Click X:" + e.pageX + ", Y:" + e.pageY);
-
-	 });
 
 
 	function Init(){
 		GenerateCircles();
 	}
+
 	 /*
 	  * Update screen
 	  */ 
@@ -51,7 +60,17 @@ $(function(){
 	  */ 
 	 function GenerateCircles(){
 	 	for(var i = 0; i<=totalTestCircles; i++){
-	 		var circle = {x : RandomInt(), y: RandomInt(), r: RandomInt(50), mx : RandomInt(5), my : RandomInt(5)};
+	 		var circle = {
+	 			x : RandomInt(), 
+	 			y: RandomInt(), 
+	 			r: RandomInt(50), 
+	 			mx : RandomInt(5), 
+	 			my : RandomInt(5), 
+	 			color: circleColors[0],
+	 			opacity: .5,
+	 			position: i
+	 		};
+
 	 		circles.push(circle);
 	 	}
 	 }
@@ -94,7 +113,6 @@ $(function(){
 	  * Draw A Circle 
 	  */ 
 	 function DrawCircles(){
-	 	console.log(circles);
 	 	var SVGCircles = d3.select(Canvas).selectAll('.data-circles').data(circles)
 	  		
 	  	SVGCircles.enter()
@@ -104,7 +122,9 @@ $(function(){
 	  		.attr('cx', function(d){return d.x;})
 	  		.attr('cy', function(d){return d.y;})
 	  		.attr('r', function(d){return d.r;})
-	  		.style('fill', 'blue')
+	  		.attr('opacity', .5)
+	  		.attr('data-position', function(d){return d.position})
+	  		.style('fill', function(d){ return d.color;})
 	  	
 	  	SVGCircles.exit().remove();
 	 }
