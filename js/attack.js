@@ -12,10 +12,13 @@ $(function(){
 				"#ff0099", // pink
 				"#ffbc00" // orange
 		],
-		totalClicks = circleColors.length - 1;
+		totalClicks = circleColors.length - 1,
+		maxSpeed = 7,
+		totalDeadCircles = 0;
 
 	Init();
 	
+
 	setInterval(Update, 30);
 
 	// resize the canvas to fill browser window dynamically
@@ -25,52 +28,76 @@ $(function(){
 	$('body').on('click', 'circle', function(){
 		var circlePosition = $(this).data('position'); 
 		var circle = circles[circlePosition ];
-		//circle.clicks = "#00ff00";
-		if(circle.numOfClicks){
-			circle.numOfClicks += 1;
-		}
-		else{
-			circle.numOfClicks = 1;
-		}
-		circle.color = circleColors[circle.numOfClicks];
 
-		if(circle.numOfClicks >= totalClicks ){
-			//delete circles[circlePosition];
-			//Log("DESTROY");
+		if(circle.numOfClicks < circleColors.length -1){
+			if(circle.numOfClicks < (circleColors.length - 1)){
+				circle.numOfClicks += 1;
+			}
+
+			if(circle.numOfClicks == circleColors.length -1){
+				circle.alive = false;
+				totalDeadCircles++;
+				checkDeadCircles();
+			
+			}
+			circle.color = circleColors[circle.numOfClicks];
 		}
+		
+
+
+		
 		
 	});
 
 
 	function Init(){
 		GenerateCircles();
+		checkDeadCircles(); // make sure all circles aren't dead on startup
 	}
 
+
+	function checkDeadCircles(){
+		if(totalDeadCircles == totalTestCircles){
+			console.log("ALL DEAD");
+		}
+	}
 	 /*
 	  * Update screen
 	  */ 
 	 function Update(){
 		DrawCircles();
 		MoveCircles();
+		DrawScore();
 	 }
+
 
 
 	  /*
 	  * Generate Test Circles
 	  */ 
 	 function GenerateCircles(){
-	 	for(var i = 0; i<=totalTestCircles; i++){
-	 		var circle = {
-	 			x : RandomInt(), 
-	 			y: RandomInt(), 
-	 			r: RandomInt(50), 
-	 			mx : RandomInt(5), 
-	 			my : RandomInt(5), 
-	 			color: circleColors[0],
-	 			opacity: .5,
-	 			position: i
-	 		};
 
+	 	for(var i = 0; i<totalTestCircles; i++){
+	 		var setColor = RandomInt(circleColors.length) - 1;
+	 		var isAlive = (setColor != (circleColors.length-1));
+
+	 		if(!isAlive){
+	 			totalDeadCircles++;
+	 		}
+
+	 		totalDeadCircles
+	 		var circle = {
+	 			x : RandomInt($(window).width()), 
+	 			y: RandomInt($(window).height()), 
+	 			r: RandomInt(100, 20), 
+	 			mx : RandomInt(maxSpeed), 
+	 			my : RandomInt(maxSpeed), 
+	 			color: circleColors[setColor],
+	 			numOfClicks: setColor,
+	 			opacity: .5,
+	 			position: i,
+	 			alive: isAlive
+	 		};
 	 		circles.push(circle);
 	 	}
 	 }
@@ -99,15 +126,34 @@ $(function(){
 	 	}
 	 }
 
+
+
 	  /*
 	  * Generate A Random number
-	  */ 
-	 function RandomInt(max){
+	  */
+	 function RandomInt(max, min){
 	 	if(!max){
 	 		max = 500;
 	 	}
-	 	return Math.ceil(Math.random()*max);
+	 	if(!min){
+	 		min = 0;
+	 	}
+	 	 return Math.ceil(Math.random() * (max - min) + min);
 	 }
+
+
+	 function DrawScore(){
+	 		var data = {"score": totalDeadCircles};
+	 		var score = d3.select("#Score").selectAll(".score-data").data([data]);
+
+	 		score.enter()
+	 			.append("div").classed("score-data", true).style("color", circleColors[circleColors.length-1])
+
+	 		score
+	 			.text(function(d){ console.log(d.score); return "Orange: " + d.score;})
+
+	 }
+
 
 	 /*
 	  * Draw A Circle 
@@ -123,44 +169,22 @@ $(function(){
 	  		.attr('cy', function(d){return d.y;})
 	  		.attr('r', function(d){return d.r;})
 	  		.attr('opacity', .5)
+	  		.attr('stroke', function(d){
+	  			if(!d.alive){
+	  				return 'white';
+	  			}
+	  		})
+	  		.attr('stroke-width', 6)
 	  		.attr('data-position', function(d){return d.position})
 	  		.style('fill', function(d){ return d.color;})
 	  	
 	  	SVGCircles.exit().remove();
 	 }
 
-	 /*
-	  * Draw A Circle At the current Most Position
-	  */ 
-	  function DrawPointerCircle(circle){
-	  	console.log(circle);
-	  	
-	  	var pointerSVGCircle = getPointerCircle().data([circle])
-	  		
-	  	pointerSVGCircle.enter()
-	  		.append('circle')
-	  		
-	  	pointerSVGCircle
-	  		.attr('id', pointerCircle)
-	  		.attr('cx', circle.x)
-	  		.attr('cy', circle.y)
-	  		.attr('r', circle.r)
-	  		.style('fill', 'red')
-	  	
-	  	pointerSVGCircle.exit().remove();
-	}
 
-	function getPointerCircle(){
-		return d3.select(Canvas).selectAll('#' + pointerCircle)
-	}
-	// resizeCanvas();
-	// function resizeCanvas(){
-	// 	CanvasObj.width = window.innerWidth;
- //        CanvasObj.height = window.innerHeight;
-	//}
 	  
 	 /*
-	  * Append Data to the interaction Log
+	  * Append Data to the interaction Log (this is mainly for me to see what's going on)
 	  */
 	 function Log(content){
 	 	$('#Logger').prepend("<li>" + content + "</li>");
