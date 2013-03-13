@@ -1,3 +1,9 @@
+/*
+ * A Little script using D3.js to draw and animate circles across the browser
+ * User just has to click all the circles to get to the final color (orange) and they win
+ *
+ */
+
 $(function(){
 	var Canvas = "#Canvas",
 		CanvasObj = $("#Canvas"),
@@ -16,14 +22,12 @@ $(function(){
 		maxSpeed = 7,
 		totalDeadCircles = 0;
 
+	// intializing the game
 	Init();
-	
 
+
+	// game drawing
 	setInterval(Update, 30);
-
-	// resize the canvas to fill browser window dynamically
-    //window.addEventListener('resize', resizeCanvas, false);
-
 
 	$('body').on('click', 'circle', function(){
 		var circlePosition = $(this).data('position'); 
@@ -42,23 +46,34 @@ $(function(){
 			}
 			circle.color = circleColors[circle.numOfClicks];
 		}
-		
 
+		$("#Instructions").html("You Got It!").delay(500).fadeOut();
+		
+	});
 
-		
-		
+	$("#PlayMoreButton").click(function(e){
+		e.preventDefault();
+		totalTestCircles += 5; 
+		Init();
 	});
 
 
 	function Init(){
+		HideDino();
+		ResetInstructions();
+		totalDeadCircles = 0;
+		circles = [];
 		GenerateCircles();
 		checkDeadCircles(); // make sure all circles aren't dead on startup
 	}
 
+	function ResetInstructions(){
+		$("#Instructions").html("Click The Balls!").show();
+	}
 
 	function checkDeadCircles(){
 		if(totalDeadCircles == totalTestCircles){
-			console.log("ALL DEAD");
+			ShowDino();
 		}
 	}
 	 /*
@@ -69,7 +84,6 @@ $(function(){
 		MoveCircles();
 		DrawScore();
 	 }
-
 
 
 	  /*
@@ -89,12 +103,11 @@ $(function(){
 	 		var circle = {
 	 			x : RandomInt($(window).width()), 
 	 			y: RandomInt($(window).height()), 
-	 			r: RandomInt(100, 20), 
+	 			r: RandomInt(100, 40), 
 	 			mx : RandomInt(maxSpeed), 
 	 			my : RandomInt(maxSpeed), 
 	 			color: circleColors[setColor],
 	 			numOfClicks: setColor,
-	 			opacity: .5,
 	 			position: i,
 	 			alive: isAlive
 	 		};
@@ -150,27 +163,35 @@ $(function(){
 	 			.append("div").classed("score-data", true).style("color", circleColors[circleColors.length-1])
 
 	 		score
-	 			.text(function(d){ console.log(d.score); return "Orange: " + d.score;})
+	 			.text(function(d){ return "Orange: " + d.score;})
 
 	 }
 
 
 	 /*
-	  * Draw A Circle 
+	  * Draw all of the circles onto the board using D3.js 
 	  */ 
 	 function DrawCircles(){
 	 	var SVGCircles = d3.select(Canvas).selectAll('.data-circles').data(circles)
 	  		
 	  	SVGCircles.enter()
 	  		.append('circle').classed('data-circles', true);
-	  		
+	  	
+
 	  	SVGCircles
 	  		.attr('cx', function(d){return d.x;})
 	  		.attr('cy', function(d){return d.y;})
 	  		.attr('r', function(d){return d.r;})
-	  		.attr('opacity', .5)
+	  		.attr('opacity', function(d){ 
+	  			if(d.alive){
+	  				return .5;
+	  			}
+	  			else{
+	  				return .8;
+	  			}
+	  		})
 	  		.attr('stroke', function(d){
-	  			if(!d.alive){
+	  			if(!d.alive){ // only showing a stroke on "dead" circles
 	  				return 'white';
 	  			}
 	  		})
@@ -181,7 +202,13 @@ $(function(){
 	  	SVGCircles.exit().remove();
 	 }
 
+	function ShowDino(){
+		$("#Dino").addClass("show-dino");
+	}
 
+	function HideDino(){
+		$("#Dino").removeClass("show-dino");
+	}
 	  
 	 /*
 	  * Append Data to the interaction Log (this is mainly for me to see what's going on)
@@ -189,4 +216,5 @@ $(function(){
 	 function Log(content){
 	 	$('#Logger').prepend("<li>" + content + "</li>");
 	 }
-})
+});
+

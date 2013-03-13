@@ -11,6 +11,8 @@ body{
 }
 
 #Canvas{
+	height: 100%;
+	width: 100%;
 	/*cursor: none;*/
 	/*display:block;*//* To remove the scrollbars */
 }
@@ -27,6 +29,15 @@ circle{
 	cursor: pointer;
 }
 
+#Instructions{
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	margin-left: -90px;
+	font-size: 20px;
+	color: #ccc;
+}
+
 #Score{
 	position: absolute;
 	top: 10px;
@@ -34,7 +45,38 @@ circle{
 	font-size: 30px;
 	color: #fff;
 	font-weight: bold;
+}
 
+#Dino{
 
+	position: fixed;
+	bottom: -209px;
+	right: 10%;
+
+	-webkit-transition:all 1.0s ease-in-out;
+  -moz-transition:all 1.0s ease-in-out;
+  -o-transition:all 1.0s ease-in-out;
+  transition:all 1.0s ease-in-out;
+
+}
+
+#Dino .dino-logo{
+	width: 226px;
+	height: 209px;
+	background: url('../images/yay-dino.png');
+	float: left;
+}
+
+#Dino a{
+	float: right;
+	margin-top: 50px;
+	font-size: 16px;
+	color: #cb0e0e;
+	background: #fff;
+	padding: 5px;
+}
+
+#Dino.show-dino{
+	bottom: -50px;
 }
 
