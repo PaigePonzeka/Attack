@@ -69,8 +69,7 @@ $(function(){
 	 		if(!isAlive){
 	 			totalDeadCircles++;
 	 		}
-
-	 		//totalDeadCircles
+	 		
 	 		var circle = {
 	 			x : RandomInt($(window).width()), 
 	 			y: RandomInt($(window).height()), 
@@ -82,8 +81,9 @@ $(function(){
 	 			position: circles.length,
 	 			alive: isAlive
 	 		};
-	 		//Log("Circle Generated: {x: " + circle.x +", y: " +circle.y +" , r: "+ circle.r +" , mx:" + circle.mx +" , my:" + circle.my +" , color: "+ circle.color +" , numOfClicks: , position: , alive:");
+	 		
 	 		circles.push(circle);
+	 		console.log(circles);
 	 }
 
 	 /*
