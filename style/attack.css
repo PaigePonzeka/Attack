@@ -80,3 +80,15 @@ circle{
 	bottom: -50px;
 }
 
+.add-circle {
+	position: fixed;
+	bottom: 10px;
+	right: 10px;
+}
+
+.remove-circle {
+	position: fixed;
+	left: 10px;
+	bottom: 10px;
+}
+

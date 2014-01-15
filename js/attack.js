@@ -22,10 +22,6 @@ $(function(){
 		maxSpeed = 7,
 		totalDeadCircles = 0;
 
-	// intializing the game
-	Init();
-
-
 	// game drawing
 	setInterval(Update, 30);
 
@@ -46,30 +42,7 @@ $(function(){
 			}
 			circle.color = circleColors[circle.numOfClicks];
 		}
-
-		$("#Instructions").html("You Got It!").delay(500).fadeOut();
-		
 	});
-
-	$("#PlayMoreButton").click(function(e){
-		e.preventDefault();
-		totalTestCircles += 5; 
-		Init();
-	});
-
-
-	function Init(){
-		HideDino();
-		ResetInstructions();
-		totalDeadCircles = 0;
-		circles = [];
-		GenerateCircles();
-		checkDeadCircles(); // make sure all circles aren't dead on startup
-	}
-
-	function ResetInstructions(){
-		$("#Instructions").html("Click The Balls!").show();
-	}
 
 	function checkDeadCircles(){
 		if(totalDeadCircles == totalTestCircles){
@@ -86,12 +59,10 @@ $(function(){
 	 }
 
 
-	  /*
-	  * Generate Test Circles
-	  */ 
-	 function GenerateCircles(){
-
-	 	for(var i = 0; i<totalTestCircles; i++){
+	 /* 
+	  * Creates a new Circle and Adds it to the circles array
+	  */
+	 function addCircle() {
 	 		var setColor = RandomInt(circleColors.length) - 1;
 	 		var isAlive = (setColor != (circleColors.length-1));
 
@@ -99,7 +70,7 @@ $(function(){
 	 			totalDeadCircles++;
 	 		}
 
-	 		totalDeadCircles
+	 		//totalDeadCircles
 	 		var circle = {
 	 			x : RandomInt($(window).width()), 
 	 			y: RandomInt($(window).height()), 
@@ -108,13 +79,24 @@ $(function(){
 	 			my : RandomInt(maxSpeed), 
 	 			color: circleColors[setColor],
 	 			numOfClicks: setColor,
-	 			position: i,
+	 			position: circles.length,
 	 			alive: isAlive
 	 		};
+	 		//Log("Circle Generated: {x: " + circle.x +", y: " +circle.y +" , r: "+ circle.r +" , mx:" + circle.mx +" , my:" + circle.my +" , color: "+ circle.color +" , numOfClicks: , position: , alive:");
 	 		circles.push(circle);
-	 	}
 	 }
 
+	 /*
+	  * Deletes a circle from the array
+	  */
+	 function removeCircle() {
+	 	circles.pop();
+	 	console.log(circles);
+	 }
+
+	 /*
+	  * Updates circle data so its position moves in the proper direction
+	  */
 	 function MoveCircles(){
 	 	$.each( circles, function(){
 	 		this.x = this.x + this.mx;
@@ -125,6 +107,9 @@ $(function(){
 	 	});
 	 }
 
+	 /*
+	  * Just some Collision detecting so it bounces back when it goes off screen
+	  */
 	 function checkScreenCollisionX(circle){
 	 	/* if the circle goes off the screen redirect it */
 	 	if(circle.x >= $('body').width() || circle.x <= 0){
@@ -138,6 +123,7 @@ $(function(){
 	 		circle.my = -(circle.my);
 	 	}
 	 }
+
 
 
 
@@ -172,12 +158,27 @@ $(function(){
 	  * Draw all of the circles onto the board using D3.js 
 	  */ 
 	 function DrawCircles(){
-	 	var SVGCircles = d3.select(Canvas).selectAll('.data-circles').data(circles)
-	  		
+	 	// DATA JOIN
+	 	// join new data with old elements (if there are any)
+	 	// selects circls (even if they don't exist yet!)
+	 	// data counts and parses out data set 
+	 	// (d3 can handle geoJSON and complicated JSON files with ease)
+	 	// can even import csv's 
+	 	var SVGCircles = d3.select(Canvas)
+	 											.selectAll('.data-circles')
+	 											.data(circles)
+	  	// WHERE THE MAGIC HAPPENS
+	  	// ENTER() 
+	  	// looks at the DOM and then the data being handed to it. 
+	  	// enter() - contains placeholder elements which have corresponding data
+	  	// append() takes the placeholder element created and inserts it into the DOM
+	  	// classed()
 	  	SVGCircles.enter()
-	  		.append('circle').classed('data-circles', true);
+	  		.append('circle')
+	  		.classed('data-circles', true);
 	  	
-
+	  	// UPDATE
+	  	// update existing elements as needed 
 	  	SVGCircles
 	  		.attr('cx', function(d){return d.x;})
 	  		.attr('cy', function(d){return d.y;})
@@ -199,22 +200,28 @@ $(function(){
 	  		.attr('data-position', function(d){return d.position})
 	  		.style('fill', function(d){ return d.color;})
 	  	
-	  	SVGCircles.exit().remove();
+	  	// lets d3 determine which elements are at the 'exit' stage
+	  	// this is more useful when you have more valuable data then just circle popping of an array
+	  	// exit() contains all elements which have no corresponding data (opposite of enter())
+	  	// remove() gets rid of them
+	  	SVGCircles
+	  		.exit()
+	  		.remove();
 	 }
 
-	function ShowDino(){
-		$("#Dino").addClass("show-dino");
-	}
-
-	function HideDino(){
-		$("#Dino").removeClass("show-dino");
-	}
-	  
 	 /*
 	  * Append Data to the interaction Log (this is mainly for me to see what's going on)
 	  */
 	 function Log(content){
 	 	$('#Logger').prepend("<li>" + content + "</li>");
 	 }
+
+	 $('.js-add-circle').click(function(){
+	 	addCircle();
+	 });
+
+	 $('.js-remove-circle').click(function(){
+	 	removeCircle();
+	 });
 });
 
